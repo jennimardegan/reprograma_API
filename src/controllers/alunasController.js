@@ -1,4 +1,5 @@
 const alunas = require('../model/alunas.json')
+const fs = require('fs'); //fs = file system, criado para podermos gravar as infos do POST
 
 exports.get = (req, res) => {
     console.log(req.url)
@@ -63,3 +64,39 @@ exports.getIdade = (req, res) => {
           return idade
         }
 
+exports.post = (req, res) => {
+    const { nome, dateOfBirth, nasceuEmSp, id, livros } = req.body; //desestruturação do array nestes parâmetros
+    alunas.push({ nome, dateOfBirth, nasceuEmSp, id, livros}); //adicionar por push estes itens no array json (base de dados)
+    
+    fs.writeFile("./src/model/alunas.json", JSON.stringify(alunas), 'utf8', function (err) {
+        if (err) {
+            return res.status(500).send({ message: err });
+        }
+        console.log("The file was saved!");
+    });
+
+/*writeFile = escrever no arquivo (deve ter o caminho absoluto do arquivo a ser manipulado para não dar erro)
+stringify = transformar o arquivo em string para poder manipular e alterar as infos
+utf8 = nomenclatura para entender e gravar com acentuações */
+
+    return res.status(201).send(alunas); //201 para indicar que o arquivo original foi modificado
+    }
+
+    exports.postBooks = (req, res) => {
+        const id = req.params.id
+        const aluna = alunas.find(aluna => aluna.id == id)
+        if (!aluna) {
+            res.send("Não encontrei essa aluna")
+        }
+        const { titulo, leu } = req.body;
+        alunas[aluna.id - 1].livros.push({ titulo, leu }); // [aluna.id - 1] pois estamos comparando a posição no array que inicia em 0 com o id que inicia em 1
+                
+        fs.writeFile("./src/model/alunas.json", JSON.stringify(alunas), 'utf8', function (err) {
+            if (err) {
+                return res.status(500).send({ message: err });
+            }
+            console.log("The file was saved!");
+        });
+
+        return res.status(201).send(alunas[aluna.id - 1].livros); // utiliza-se o return para garantir que nada será executado após esta linha
+        }

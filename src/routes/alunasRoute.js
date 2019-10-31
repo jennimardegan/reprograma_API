@@ -7,5 +7,7 @@ router.get('/nasceuSp', controller.getSp) //incluído por último, mas é necess
 router.get('/:id', controller.getById) //:id = "criando" uma variável
 router.get('/:id/idade', controller.getIdade)
 router.get('/:id/books', controller.getBooks)
-//nomes após / é o que será digitado na URL para busca
+router.post('/', controller.post)
+router.post('/:id/books', controller.postBooks)
+
 module.exports = router
